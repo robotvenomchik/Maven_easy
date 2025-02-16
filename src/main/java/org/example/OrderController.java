@@ -1,6 +1,7 @@
 package org.example;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +36,19 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
-        order.setId(id);
-        return orderRepository.save(order);
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order) {
+        Optional<Order> existingOrderOptional = orderRepository.findById(id);
+        if (!existingOrderOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Order existingOrder = existingOrderOptional.get();
+
+        existingOrder.setTotalCost(order.getTotalCost());
+        existingOrder.setProducts(order.getProducts());
+
+        Order updatedOrder = orderRepository.save(existingOrder);
+
+        return ResponseEntity.ok(updatedOrder);
     }
+
 }

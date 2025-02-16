@@ -2,10 +2,7 @@ package org.example;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -13,6 +10,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Double totalCost;
 
     @ManyToMany
@@ -28,17 +26,31 @@ public class Order {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        calculateTotalCost();
     }
 
-    public Order(Long id, Double totalCost, List<Product> products, LocalDateTime createdAt) {
+    public void calculateTotalCost() {
+        if (products != null) {
+            totalCost = products.stream().mapToDouble(Product::getPrice).sum();
+        } else {
+            totalCost = 0.0;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        calculateTotalCost();
+    }
+
+    public Order(Long id, List<Product> products, LocalDateTime createdAt) {
         this.id = id;
-        this.totalCost = totalCost;
         this.products = products;
         this.createdAt = createdAt;
+        calculateTotalCost();
     }
+
     public Order(){};
 
-    // Геттери та сеттери
     public Long getId() {
         return id;
     }
@@ -51,16 +63,13 @@ public class Order {
         return totalCost;
     }
 
-    public void setTotalCost(Double totalCost) {
-        this.totalCost = totalCost;
-    }
-
     public List<Product> getProducts() {
         return products;
     }
 
     public void setProducts(List<Product> products) {
         this.products = products;
+        calculateTotalCost();
     }
 
     public LocalDateTime getCreatedAt() {
@@ -69,5 +78,9 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setTotalCost(Double totalCost) {
+        this.totalCost = totalCost;
     }
 }
