@@ -11,6 +11,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -27,6 +29,13 @@ public class OrderController {
 
     @PostMapping
     public Order addOrder(@RequestBody Order order) {
+        if (order.getProducts() != null) {
+            for (Product product : order.getProducts()) {
+                if (product.getId() == null || !productRepository.existsById(product.getId())) {
+                    productRepository.saveAndFlush(product);
+                }
+            }
+        }
         return orderRepository.save(order);
     }
 
@@ -42,13 +51,16 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
         Order existingOrder = existingOrderOptional.get();
-
-        existingOrder.setTotalCost(order.getTotalCost());
+        if (order.getProducts() != null) {
+            for (Product product : order.getProducts()) {
+                if (product.getId() == null || !productRepository.existsById(product.getId())) {
+                    productRepository.save(product);
+                }
+            }
+        }
         existingOrder.setProducts(order.getProducts());
-
+        existingOrder.calculateTotalCost();
         Order updatedOrder = orderRepository.save(existingOrder);
-
         return ResponseEntity.ok(updatedOrder);
     }
-
 }
