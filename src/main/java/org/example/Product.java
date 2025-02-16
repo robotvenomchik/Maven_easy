@@ -1,10 +1,10 @@
-package org.example.Homework41.model;
+package org.example;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
@@ -12,15 +12,18 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
+    private Double price;
 
-    private BigDecimal price;
+    // Конструктори, геттери та сеттери
 
-    @ManyToMany(mappedBy = "products")
-    @JsonIgnore
-    private List<Order> orders;
-
+    public Product(Long id, String name, Double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+    public Product(){};
+    // Геттери та сеттери
     public Long getId() {
         return id;
     }
@@ -37,19 +40,11 @@ public class Product {
         this.name = name;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
     }
 }
