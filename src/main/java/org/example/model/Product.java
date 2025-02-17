@@ -1,10 +1,6 @@
-package org.example;
-
-import java.time.LocalDateTime;
-import java.util.List;
+package org.example.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
